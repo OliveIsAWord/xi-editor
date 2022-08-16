@@ -34,15 +34,16 @@
 //! - We are integrated with the xi_rpc runloop; events are queued as
 //! they arrive, and an idle task is scheduled.
 
-use crossbeam_channel::unbounded;
-use notify::{event::*, watcher, RecommendedWatcher, RecursiveMode, Watcher};
+//use crossbeam_channel::unbounded;
+use notify::{event::*, RecommendedWatcher, recommended_watcher, RecursiveMode, Watcher};
+//use notify_debouncer_mini::new_debouncer;
 use std::collections::VecDeque;
 use std::fmt;
 use std::mem;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::time::Duration;
+//use std::time::Duration;
 
 use xi_rpc::RpcPeer;
 
@@ -93,12 +94,19 @@ pub type PathFilter = dyn Fn(&Path) -> bool + Send + 'static;
 
 impl FileWatcher {
     pub fn new<T: Notify + 'static>(peer: T) -> Self {
-        let (tx_event, rx_event) = unbounded();
+        //let (tx_event, rx_event) = unbounded();
+        let (tx_event, rx_event) = std::sync::mpsc::channel();
 
         let state = Arc::new(Mutex::new(WatcherState::default()));
         let state_clone = state.clone();
 
-        let inner = watcher(tx_event, Duration::from_millis(100)).expect("watcher should spawn");
+        // fn god_help_me(tx: Sender<notify::Result<Event>>, delay: Duration) -> notify::Result<RecommendedWatcher> {
+        //     todo!()
+        // }
+
+        //let inner = watcher(tx_event, Duration::from_millis(100)).expect("watcher should spawn");
+        //let inner = new_debouncer(Duration::from_millis(100), None, tx_event).expect("watcher should spawn");
+        let inner = recommended_watcher(tx_event).expect("watcher should spawn");
 
         thread::spawn(move || {
             while let Ok(Ok(event)) = rx_event.recv() {
@@ -467,7 +475,7 @@ mod tests {
     fn test_crash_repro() {
         let (tx, _rx) = unbounded();
         let path = PathBuf::from("/bin/cat");
-        let mut w = watcher(tx, Duration::from_secs(1)).unwrap();
+        let mut w = Watcher::new(tx, Duration::from_secs(1)).unwrap();
         w.watch(&path, RecursiveMode::NonRecursive).unwrap();
         sleep(20);
         w.watch(&path, RecursiveMode::NonRecursive).unwrap();
