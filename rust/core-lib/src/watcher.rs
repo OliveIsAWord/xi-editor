@@ -35,7 +35,7 @@
 //! they arrive, and an idle task is scheduled.
 
 //use crossbeam_channel::unbounded;
-use notify::{event::*, RecommendedWatcher, recommended_watcher, RecursiveMode, Watcher};
+use notify::{event::*, recommended_watcher, RecommendedWatcher, RecursiveMode, Watcher};
 //use notify_debouncer_mini::new_debouncer;
 use std::collections::VecDeque;
 use std::fmt;
