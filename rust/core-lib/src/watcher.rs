@@ -482,99 +482,99 @@ mod tests {
         w.unwatch(&path).unwrap();
     }
 
-    #[test]
-    fn recurse_with_contained() {
-        let (tx, rx) = unbounded();
-        let tmp = tempdir::TempDir::new("xi-test-recurse-contained").unwrap();
-        let mut w = FileWatcher::new(tx);
-        tmp.create("adir/dir2/file");
-        sleep_if_macos(35_000);
-        w.watch(&tmp.mkpath("adir"), true, 1.into());
-        sleep(10);
-        w.watch(&tmp.mkpath("adir/dir2/file"), false, 2.into());
-        sleep(10);
-        w.unwatch(&tmp.mkpath("adir"), 1.into());
-        sleep(10);
-        tmp.write("adir/dir2/file");
-        let _ = recv_all(&rx, Duration::from_millis(1000));
-        let events = w.take_events();
-        assert_eq!(
-            events,
-            vec![
-                (
-                    2.into(),
-                    Event::new(EventKind::Modify(ModifyKind::Any))
-                        .add_path(tmp.mkpath("adir/dir2/file"))
-                        .set_flag(Flag::Notice)
-                ),
-                (
-                    2.into(),
-                    Event::new(EventKind::Modify(ModifyKind::Any))
-                        .add_path(tmp.mkpath("adir/dir2/file"))
-                ),
-            ]
-        );
-    }
+    // #[test]
+    // fn recurse_with_contained() {
+    //     let (tx, rx) = unbounded();
+    //     let tmp = tempdir::TempDir::new("xi-test-recurse-contained").unwrap();
+    //     let mut w = FileWatcher::new(tx);
+    //     tmp.create("adir/dir2/file");
+    //     sleep_if_macos(35_000);
+    //     w.watch(&tmp.mkpath("adir"), true, 1.into());
+    //     sleep(10);
+    //     w.watch(&tmp.mkpath("adir/dir2/file"), false, 2.into());
+    //     sleep(10);
+    //     w.unwatch(&tmp.mkpath("adir"), 1.into());
+    //     sleep(10);
+    //     tmp.write("adir/dir2/file");
+    //     let _ = recv_all(&rx, Duration::from_millis(1000));
+    //     let events = w.take_events();
+    //     assert_eq!(
+    //         events,
+    //         vec![
+    //             (
+    //                 2.into(),
+    //                 Event::new(EventKind::Modify(ModifyKind::Any))
+    //                     .add_path(tmp.mkpath("adir/dir2/file"))
+    //                     .set_flag(Flag::Notice)
+    //             ),
+    //             (
+    //                 2.into(),
+    //                 Event::new(EventKind::Modify(ModifyKind::Any))
+    //                     .add_path(tmp.mkpath("adir/dir2/file"))
+    //             ),
+    //         ]
+    //     );
+    // }
 
-    #[test]
-    fn two_watchers_one_file() {
-        let (tx, rx) = unbounded();
-        let tmp = tempdir::TempDir::new("xi-test-two-watchers").unwrap();
-        tmp.create("my_file");
-        sleep_if_macos(30_100);
-        let mut w = FileWatcher::new(tx);
-        w.watch(&tmp.mkpath("my_file"), false, 1.into());
-        sleep_if_macos(10);
-        w.watch(&tmp.mkpath("my_file"), false, 2.into());
-        sleep_if_macos(10);
-        tmp.write("my_file");
-
-        let _ = recv_all(&rx, Duration::from_millis(1000));
-        let events = w.take_events();
-        assert_eq!(
-            events,
-            vec![
-                (
-                    1.into(),
-                    Event::new(EventKind::Modify(ModifyKind::Any))
-                        .add_path(tmp.mkpath("my_file"))
-                        .set_flag(Flag::Notice)
-                ),
-                (
-                    2.into(),
-                    Event::new(EventKind::Modify(ModifyKind::Any))
-                        .add_path(tmp.mkpath("my_file"))
-                        .set_flag(Flag::Notice)
-                ),
-                (
-                    1.into(),
-                    Event::new(EventKind::Modify(ModifyKind::Any)).add_path(tmp.mkpath("my_file"))
-                ),
-                (
-                    2.into(),
-                    Event::new(EventKind::Modify(ModifyKind::Any)).add_path(tmp.mkpath("my_file"))
-                ),
-            ]
-        );
-
-        assert_eq!(w.state.lock().unwrap().watchees.len(), 2);
-        w.unwatch(&tmp.mkpath("my_file"), 1.into());
-        assert_eq!(w.state.lock().unwrap().watchees.len(), 1);
-        sleep_if_macos(1000);
-        let path = tmp.mkpath("my_file");
-        tmp.remove("my_file");
-        sleep_if_macos(1000);
-        let _ = recv_all(&rx, Duration::from_millis(1000));
-        let events = w.take_events();
-        assert!(events.contains(&(
-            2.into(),
-            Event::new(EventKind::Remove(RemoveKind::Any))
-                .add_path(path.clone())
-                .set_flag(Flag::Notice)
-        )));
-        assert!(!events.contains(&(
-            1.into(),
-            Event::new(EventKind::Remove(RemoveKind::Any)).add_path(path).set_flag(Flag::Notice)
-        )));
-    }
+    // #[test]
+    // fn two_watchers_one_file() {
+    //     let (tx, rx) = unbounded();
+    //     let tmp = tempdir::TempDir::new("xi-test-two-watchers").unwrap();
+    //     tmp.create("my_file");
+    //     sleep_if_macos(30_100);
+    //     let mut w = FileWatcher::new(tx);
+    //     w.watch(&tmp.mkpath("my_file"), false, 1.into());
+    //     sleep_if_macos(10);
+    //     w.watch(&tmp.mkpath("my_file"), false, 2.into());
+    //     sleep_if_macos(10);
+    //     tmp.write("my_file");
+    //
+    //     let _ = recv_all(&rx, Duration::from_millis(1000));
+    //     let events = w.take_events();
+    //     assert_eq!(
+    //         events,
+    //         vec![
+    //             (
+    //                 1.into(),
+    //                 Event::new(EventKind::Modify(ModifyKind::Any))
+    //                     .add_path(tmp.mkpath("my_file"))
+    //                     .set_flag(Flag::Notice)
+    //             ),
+    //             (
+    //                 2.into(),
+    //                 Event::new(EventKind::Modify(ModifyKind::Any))
+    //                     .add_path(tmp.mkpath("my_file"))
+    //                     .set_flag(Flag::Notice)
+    //             ),
+    //             (
+    //                 1.into(),
+    //                 Event::new(EventKind::Modify(ModifyKind::Any)).add_path(tmp.mkpath("my_file"))
+    //             ),
+    //             (
+    //                 2.into(),
+    //                 Event::new(EventKind::Modify(ModifyKind::Any)).add_path(tmp.mkpath("my_file"))
+    //             ),
+    //         ]
+    //     );
+    //
+    //     assert_eq!(w.state.lock().unwrap().watchees.len(), 2);
+    //     w.unwatch(&tmp.mkpath("my_file"), 1.into());
+    //     assert_eq!(w.state.lock().unwrap().watchees.len(), 1);
+    //     sleep_if_macos(1000);
+    //     let path = tmp.mkpath("my_file");
+    //     tmp.remove("my_file");
+    //     sleep_if_macos(1000);
+    //     let _ = recv_all(&rx, Duration::from_millis(1000));
+    //     let events = w.take_events();
+    //     assert!(events.contains(&(
+    //         2.into(),
+    //         Event::new(EventKind::Remove(RemoveKind::Any))
+    //             .add_path(path.clone())
+    //             .set_flag(Flag::Notice)
+    //     )));
+    //     assert!(!events.contains(&(
+    //         1.into(),
+    //         Event::new(EventKind::Remove(RemoveKind::Any)).add_path(path).set_flag(Flag::Notice)
+    //     )));
+    // }
 }
