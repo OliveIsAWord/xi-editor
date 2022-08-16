@@ -56,7 +56,7 @@ pub struct Builder {
     dirty: bool,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum RenderTactic {
     /// Discard all content for this span. Used to keep storage reasonable.
     Discard,

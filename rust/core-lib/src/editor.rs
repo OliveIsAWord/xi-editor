@@ -27,7 +27,7 @@ use xi_trace::{trace_block, trace_payload};
 
 use crate::annotations::{AnnotationType, Annotations};
 use crate::config::BufferItems;
-use crate::edit_ops::{self, IndentDirection};
+use crate::edit_ops::{self, IndentDirection, last_selection_region};
 use crate::edit_types::BufferEvent;
 use crate::event_context::MAX_SIZE_LIMIT;
 use crate::layers::Layers;
@@ -36,7 +36,7 @@ use crate::movement::Movement;
 use crate::plugins::rpc::{DataSpan, GetDataResponse, PluginEdit, ScopeSpan, TextUnit};
 use crate::plugins::PluginId;
 use crate::rpc::SelectionModifier;
-use crate::selection::{InsertDrift, SelRegion, Selection};
+use crate::selection::{InsertDrift, Selection};
 use crate::styles::ThemeStyleMap;
 use crate::view::{Replace, View};
 
@@ -734,14 +734,9 @@ impl EditType {
     }
 }
 
-fn last_selection_region(regions: &[SelRegion]) -> Option<&SelRegion> {
-    for region in regions.iter().rev() {
-        if !region.is_caret() {
-            return Some(region);
-        }
-    }
-    None
-}
+// fn last_selection_region(regions: &[SelRegion]) -> Option<&SelRegion> {
+//     regions.iter().rev().find(|&region| !region.is_caret())
+// }
 
 /// Counts the number of lines in the string, not including any trailing newline.
 fn count_lines(s: &str) -> usize {

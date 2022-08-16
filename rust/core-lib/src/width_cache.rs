@@ -36,7 +36,7 @@ pub struct WidthCache {
     widths: Vec<Width>,
 }
 
-#[derive(Eq, PartialEq, Hash)]
+#[derive(PartialEq, Eq, Hash)]
 struct WidthCacheKey<'a> {
     id: StyleId,
     s: Cow<'a, str>,

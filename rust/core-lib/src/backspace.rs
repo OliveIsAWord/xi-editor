@@ -37,7 +37,7 @@ pub fn offset_for_delete_backwards(region: &SelRegion, text: &Rope, config: &Buf
         if preceded_by_spaces && config.translate_tabs_to_spaces && config.use_tab_stops {
             tab_start
         } else {
-            #[derive(PartialEq)]
+            #[derive(PartialEq, Eq)]
             enum State {
                 Start,
                 Lf,

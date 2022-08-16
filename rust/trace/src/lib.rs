@@ -338,7 +338,7 @@ impl MetadataType {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SampleArgs {
     /// An arbitrary payload to associate with the sample.  The type is
     /// controlled by features (default string).

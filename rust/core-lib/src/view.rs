@@ -104,7 +104,7 @@ pub struct View {
 }
 
 /// Indicates what changed in the find state.
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Eq, Debug)]
 enum FindStatusChange {
     /// None of the find parameters or number of matches changed.
     None,
@@ -117,7 +117,7 @@ enum FindStatusChange {
 }
 
 /// Indicates what changed in the find state.
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 enum FindProgress {
     /// Incremental find is done/not running.
     Ready,
@@ -130,7 +130,7 @@ enum FindProgress {
 }
 
 /// Contains replacement string and replace options.
-#[derive(Debug, Default, PartialEq, Serialize, Deserialize, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, Serialize, Deserialize, Clone)]
 pub struct Replace {
     /// Replacement string.
     pub chars: String,

@@ -26,7 +26,7 @@ use crate::rpc::{
 use crate::view::Size;
 
 /// Events that only modify view state
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub(crate) enum ViewEvent {
     Move(Movement),
     ModifySelection(Movement),
@@ -52,7 +52,7 @@ pub(crate) enum ViewEvent {
 }
 
 /// Events that modify the buffer
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub(crate) enum BufferEvent {
     Delete { movement: Movement, kill: bool },
     Backspace,
